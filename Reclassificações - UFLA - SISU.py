@@ -1,4 +1,3 @@
-import requests
 import xlsxwriter  
 from selenium import webdriver
 import selenium.webdriver.support.expected_conditions as EC
@@ -16,51 +15,93 @@ options.add_experimental_option("detach", True)
 
 navegador = webdriver.Chrome(ChromeDriverManager().install(), options=options)
 
+#Processos s
 navegador.get("https://sig.ufla.br/modulos/processos_seletivos_alunos/candidatos_alunos/acesso/chamadas.php")
 
 sleep(5)
-
-navegador.find_element(By.XPATH, '//*[@id="cod_processo_seletivo"]').click()
-
-for i in range(5):
-    navegador.find_element(By.XPATH, '//*[@id="cod_processo_seletivo"]').send_keys(Keys.ARROW_UP)
-
-navegador.find_element(By.XPATH, '//*[@id="cod_processo_seletivo"]').send_keys(Keys.ENTER)
-
-sleep(5)
-navegador.find_element(By.XPATH, '//*[@id="enviar"]').click()
-
-sleep(5)
-
-tabelas = navegador.find_elements(By.CLASS_NAME, 'tabela')
-print(len(tabelas))
-
 
 curso=[]
 aluno = []
 modalidade=[]
 
+navegador.find_element(By.XPATH, '//*[@id="cod_processo_seletivo"]').click()
 
-for i in range(1, len(tabelas)-1):
-    print(i)
+opcoes = (navegador.find_element(By.XPATH, '//*[@id="cod_processo_seletivo"]').text).split("\n")
+print(opcoes)
 
-    print('//*[@id="centro"]/table[' + str(i) + ']/caption')
 
-    curso_aux =(navegador.find_element(By.XPATH, '//*[@id="centro"]/table[' + str(i) + ']/caption').text.split("-")[1].split(" na")[0])
+n_cliques = []
+
+for j in range(len(opcoes)):
     
-    alunos = int(navegador.find_element(By.XPATH, '//*[@id="centro"]/table[' + str(i) + ']/tfoot/tr/td').text.split(" ")[1])
+    if(opcoes[j].split(" ")[0] == "SISU" and opcoes[j].split(" ")[2] == "2023/1"):
+        print(j)
 
-    for j in range(1, alunos+1):
-        curso.append(curso_aux)
-        aluno.append(navegador.find_element(By.XPATH, '//*[@id="centro"]/table[' + str(i) + ']/tbody/tr[' + str(j)+']/td[1]').text)
-        modalidade.append(navegador.find_element(By.XPATH, '//*[@id="centro"]/table[' + str(i) + ']/tbody/tr[' + str(j)+']/td[2]').text)
+        print(len(opcoes)-j - 1)
+
+        n_cliques.append(len(opcoes)-j - 1)
+
+print("Numero de cliques\n")
+for t in range(len(n_cliques)):
+    print(n_cliques[t])
+
+print("\n")
+
+navegador.find_element(By.XPATH, '//*[@id="cod_processo_seletivo"]').click()
+
+for a in range(len(n_cliques)):
+
+    print("n de cliques")
+    
+    sleep(5)
+
+    #navegador.find_element(By.XPATH, '//*[@id="cod_processo_seletivo"]').click()
+
+    for b in range(n_cliques[a]):
+        navegador.find_element(By.XPATH, '//*[@id="cod_processo_seletivo"]').send_keys(Keys.ARROW_UP)
+
+    navegador.find_element(By.XPATH, '//*[@id="cod_processo_seletivo"]').send_keys(Keys.ENTER)
+
+    sleep(5)
+
+    navegador.find_element(By.XPATH, '//*[@id="enviar"]').click()
+
+    sleep(5)
+
+    navegador.find_element(By.XPATH, '//*[@id="enviar"]').click()
+    
+    sleep(10)
+
+    tabelas = navegador.find_elements(By.CLASS_NAME, 'tabela')
+    print(len(tabelas))
+
+    for i in range(1, len(tabelas)):
+        print(i)
+
+        print('//*[@id="centro"]/table[' + str(i) + ']/caption')
+
+        curso_aux =(navegador.find_element(By.XPATH, '//*[@id="centro"]/table[' + str(i) + ']/caption').text.split("-")[1].split(" na")[0])
         
+        alunos = int(navegador.find_element(By.XPATH, '//*[@id="centro"]/table[' + str(i) + ']/tfoot/tr/td').text.split(" ")[1])
 
-print(curso)
-print(aluno)
-print(modalidade)
+        for j in range(1, alunos+1):
+            curso.append(curso_aux)
+            aluno.append(navegador.find_element(By.XPATH, '//*[@id="centro"]/table[' + str(i) + ']/tbody/tr[' + str(j)+']/td[1]').text)
+            modalidade.append(navegador.find_element(By.XPATH, '//*[@id="centro"]/table[' + str(i) + ']/tbody/tr[' + str(j)+']/td[2]').text)
 
-#Definir o caminho para salvar o arquivo .xlsx      
+
+
+    print(curso)
+    print(aluno)
+    print(modalidade)
+
+
+    for b in range(n_cliques[a]):
+        navegador.find_element(By.XPATH, '//*[@id="cod_processo_seletivo"]').send_keys(Keys.ARROW_DOWN)
+        navegador.find_element(By.XPATH, '//*[@id="cod_processo_seletivo"]').send_keys(Keys.ENTER)
+
+
+
 book = xlsxwriter.Workbook('')     
 sheet = book.add_worksheet()  
 
